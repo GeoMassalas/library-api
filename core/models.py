@@ -9,6 +9,14 @@ class UserManager(BaseUserManager):
             raise ValueError("Users must have an email address")
         if not username:
             raise ValueError("Users must have a username")
+        if not first_name:
+            raise ValueError("Users must have a first name")
+        if not last_name:
+            raise ValueError("Users must have a last name")
+        if not address:
+            raise ValueError("Users must have an address")
+        if not phone:
+            raise ValueError("Users must have a phone number")
 
         user = self.model(
             email=self.normalize_email(email),
@@ -45,6 +53,7 @@ class UserManager(BaseUserManager):
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
+        user.is_employee = True
         user.save(using=self._db)
         return user
 
@@ -71,7 +80,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return data
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'address', 'phone']
+    REQUIRED_FIELDS = ['username']
 
     objects = UserManager()
 
@@ -81,10 +90,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Book(models.Model):
 
-    title = models.CharField(max_length=40, null=False)
+    title = models.CharField(max_length=100, null=False)
     author = models.CharField(max_length=40, null=False)
     isbn = models.CharField(max_length=10, null=False)
-    isbn13 = models.CharField(max_length=13, null=True)
+    isbn13 = models.CharField(max_length=14, null=True)
     description = models.TextField()
     category1 = models.CharField(max_length=25, null=False)
     category2 = models.CharField(max_length=25, null=True)
