@@ -5,16 +5,15 @@ from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.settings import api_settings
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView, CreateAPIView
 from core.models import User
+from core.permissions import IsEmployee
 from .serializers import UserSerializer, AuthTokenSerializer
 
 
 class LoginView(ObtainAuthToken):
-    queryset = User.objects.all()
     serializer_class = AuthTokenSerializer
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
-    permission_classes = [AllowAny]
 
 
 class ProfileView(RetrieveAPIView):
@@ -28,4 +27,10 @@ class ProfileView(RetrieveAPIView):
         user = get_object_or_404(queryset)
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CreateUserView(CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]
 

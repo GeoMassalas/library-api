@@ -31,30 +31,22 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_employee(self, email, username, password):
-        user = self.create_user(
-            email=self.normalize_email(email),
-            username=username,
-            password=password
-        )
-        user.is_admin = False
-        user.is_staff = True
-        user.is_superuser = False
-        user.is_employee = True
-        user.save(using=self._db)
-        return user
-
     def create_superuser(self, email, username, password):
         user = self.create_user(
             email=self.normalize_email(email),
             username=username,
-            password=password
+            password=password,
+            first_name='Admin',
+            last_name='Admin',
+            address='Admin',
+            phone='Admin',
         )
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
         user.is_employee = True
         user.save(using=self._db)
+
         return user
 
 
@@ -68,16 +60,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    """ Station Specific """
     first_name = models.CharField(max_length=50, null=False)
     last_name = models.CharField(max_length=50, null=False)
     address = models.CharField(max_length=50, null=False)
     phone = models.CharField(max_length=50, null=False)
     is_employee = models.BooleanField(default=False, null=False)
 
-    def books(self):
-        data = Transaction.objects.filter(user=self, is_active=True)
-        return data
+#    def books(self):
+#        data = Transaction.objects.filter(user=self, is_active=True)
+#        return data
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -105,23 +96,15 @@ class Book(models.Model):
 
 class Transaction(models.Model):
 
-    TRANSACTIONS = [
-        ('lending', 'Lending a book'),
-        ('renewal', 'Renewing a book')
-    ]
     book = models.ForeignKey(Book, on_delete=models.CASCADE, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
-    date = models.DateTimeField(auto_now_add=True)
-    type = models.CharField(max_length=10, choices=TRANSACTIONS)
+    date = models.DateField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    renewals = models.SmallIntegerField(default=0)
 
     def due_date(self):
-        if self.type == 'lending':
-            d = timedelta(days=30)
-        elif self.type == 'renewal':
-            d = timedelta(days=15)
-        return self.data+d
+        return self.date + timedelta(days=30+self.renewals*15)
 
     def __str__(self):
-        return self.date
+        return str(self.due_date()) + " - " + str(self.book) + " - " + str(self.user)
 

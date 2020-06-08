@@ -73,7 +73,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'lib.wsgi.application'
 
-
 AUTH_USER_MODEL = 'core.User'
 
 REST_FRAMEWORK = {
@@ -87,6 +86,7 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
 }
+
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 

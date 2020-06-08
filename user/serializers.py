@@ -8,26 +8,28 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('id', 'username', 'first_name', 'last_name', 'password', 'password2', 'email', 'address', 'phone', '',
-                  'altitude', 'data')
+        fields = ('id', 'username', 'first_name', 'last_name', 'password', 'password2', 'email', 'address', 'phone')
         extra_kwargs = {'password': {'style': {'input_type': 'password'}, 'write_only': True,
                                      'required': True, 'min_length': 8}}
 
     def create(self, validated_data):
         return get_user_model().objects.create_user(**validated_data)
 
+    def update(self, instance, validated_data):
+        """Update a user, setting the password correctly and return it"""
+        password = validated_data.pop('password', None)
+        user = super().update(instance, validated_data)
+
+        if password:
+            user.set_password(password)
+            user.save()
+        return user
+
     def validate(self, data):
         if data['password'] != data['password2']:
             raise serializers.ValidationError("Passwords don't match.")
         del data['password2']
         return data
-
-
-class MinimalStationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = get_user_model()
-        fields = ('id', 'external_id', 'latitude', 'longitude',
-                  'altitude', 'data')
 
 
 class AuthTokenSerializer(serializers.Serializer):
