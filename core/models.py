@@ -63,7 +63,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=50, null=False)
     last_name = models.CharField(max_length=50, null=False)
     address = models.CharField(max_length=50, null=False)
-    phone = models.CharField(max_length=50, null=False)
+    phone = models.CharField(max_length=10, null=False)
     is_employee = models.BooleanField(default=False, null=False)
 
 #    def books(self):

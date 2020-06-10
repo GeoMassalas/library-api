@@ -30,7 +30,9 @@ class UserSerializer(serializers.ModelSerializer):
             if data['password'] != data['password2']:
                 raise serializers.ValidationError("Passwords don't match.")
             del data['password2']
-
+        if 'phone' in data:
+            if (len(data['phone']) != 10) | (not data['phone'].isdigit()):
+                raise serializers.ValidationError("Phone number must be 10 numbers.")
         return data
 
 
