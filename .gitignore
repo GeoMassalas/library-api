@@ -112,3 +112,4 @@ media/
 
 .idea/
 db.sqlite3
+/media/

@@ -1,6 +1,16 @@
-from django.db import models
 from datetime import timedelta
+import uuid
+import os
+from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
+
+def book_image_file_path(instance, filename):
+    """ Generate file path for new image """
+    ext = filename.split('.')[-1]
+    filename = f'{uuid.uuid4()}.{ext}'
+
+    return os.path.join('media/book_imgs/', filename)
 
 
 class UserManager(BaseUserManager):
@@ -89,6 +99,9 @@ class Book(models.Model):
     category1 = models.CharField(max_length=25, null=False)
     category2 = models.CharField(max_length=25, null=True)
     category3 = models.CharField(max_length=25, null=True)
+    book_eid = models.CharField(max_length=10, null=True)
+    barcode = models.CharField(max_length=10, null=True)
+    image = models.ImageField(null=True, upload_to=book_image_file_path)
 
     def __str__(self):
         return self.title
@@ -107,4 +120,3 @@ class Transaction(models.Model):
 
     def __str__(self):
         return str(self.due_date()) + " - " + str(self.book) + " - " + str(self.user)
-
