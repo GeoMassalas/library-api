@@ -26,9 +26,11 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def validate(self, data):
-        if data['password'] != data['password2']:
-            raise serializers.ValidationError("Passwords don't match.")
-        del data['password2']
+        if 'password' in data:
+            if data['password'] != data['password2']:
+                raise serializers.ValidationError("Passwords don't match.")
+            del data['password2']
+
         return data
 
 

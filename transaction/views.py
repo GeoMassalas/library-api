@@ -52,8 +52,8 @@ class TransactionViewSet(ModelViewSet):
         user = get_object_or_404(User.objects.filter(id=data['user']))
         book = get_object_or_404(Book.objects.filter(id=data['book']))
         query = self.filter_queryset(self.get_queryset()).filter(book__id=data['book'])
-        transaction = get_object_or_404(query)
         if query:
+            transaction = get_object_or_404(query)
             res = {'message': 'The requested book is already taken.', 'due_date': transaction.due_date()}
             sts = status.HTTP_400_BAD_REQUEST
         else:
