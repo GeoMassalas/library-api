@@ -1,28 +1,13 @@
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
-from rest_framework.permissions import AllowAny
+
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.mixins import ListModelMixin
+from rest_framework.viewsets import ModelViewSet
 from core.models import Book
-from core.permissions import IsEmployee
+from core.permissions import IsManagerOrReadOnly
 from .serializers import BookSerializer
 
 
-class UserBookView(ListAPIView):
+class BooksViewSet(ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [AllowAny]
-
-
-class EmployeeBookView(ListCreateAPIView):
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
-    permission_classes = [IsEmployee]
+    permission_classes = [IsManagerOrReadOnly]
     authentication_classes = (TokenAuthentication,)
-
-
-class EmployeeBookDetailView(RetrieveUpdateDestroyAPIView):
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
-    permission_classes = [IsEmployee]
-    authentication_classes = (TokenAuthentication,)
-

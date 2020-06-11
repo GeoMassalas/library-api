@@ -10,10 +10,11 @@ def book_image_file_path(instance, filename):
     ext = filename.split('.')[-1]
     filename = f'{uuid.uuid4()}.{ext}'
 
-    return os.path.join('media/book_imgs/', filename)
+    return os.path.join('book_imgs/', filename)
 
 
 class UserManager(BaseUserManager):
+    """ User Manager Class"""
     def create_user(self, email, username, password, first_name, last_name, address, phone):
         if not email:
             raise ValueError("Users must have an email address")
@@ -49,12 +50,13 @@ class UserManager(BaseUserManager):
             first_name='Admin',
             last_name='Admin',
             address='Admin',
-            phone='Admin',
+            phone='0000000000',
         )
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
         user.is_employee = True
+        user.is_manager = True
         user.save(using=self._db)
 
         return user
@@ -75,6 +77,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     address = models.CharField(max_length=50, null=False)
     phone = models.CharField(max_length=10, null=False)
     is_employee = models.BooleanField(default=False, null=False)
+    is_manager = models.BooleanField(default=False, null=False)
 
 #    def books(self):
 #        data = Transaction.objects.filter(user=self, is_active=True)
@@ -99,9 +102,8 @@ class Book(models.Model):
     category1 = models.CharField(max_length=25, null=False)
     category2 = models.CharField(max_length=25, null=True)
     category3 = models.CharField(max_length=25, null=True)
-    book_eid = models.CharField(max_length=10, null=True)
     barcode = models.CharField(max_length=10, null=True)
-    image = models.ImageField(null=True, upload_to=book_image_file_path)
+    image = models.ImageField(blank=True, null=True, upload_to=book_image_file_path,)
 
     def __str__(self):
         return self.title

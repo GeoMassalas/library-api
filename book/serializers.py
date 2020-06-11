@@ -4,18 +4,14 @@ from core.models import Book
 
 class BookSerializer(serializers.ModelSerializer):
 
-    image = serializers.ImageField(max_length=None, use_url=True)
+    image = serializers.ImageField(max_length=None, use_url=True, required=False)
 
     class Meta:
         model = Book
         fields = ('id', 'title', 'author', 'isbn', 'isbn13', 'description', 'category1', 'category2', 'category3',
-                  'book_eid', 'barcode', 'image')
+                  'barcode', 'image')
 
-    # TODO: Validation
     def validate(self, data):
-        print(len(data['isbn13']))
-        print(data['isbn13'][4:])
-        print(data['isbn13'][:3])
         if 'isbn' in data:
             if (len(data['isbn']) != 10) | (not data['isbn'].isdigit()):
                 raise serializers.ValidationError("ISBN should be 10 numbers")

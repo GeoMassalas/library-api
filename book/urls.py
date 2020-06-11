@@ -1,8 +1,12 @@
+from django.urls import include
+from rest_framework import routers
+from .views import BooksViewSet
 from django.urls import path
-from .views import UserBookView, EmployeeBookView, EmployeeBookDetailView
+
+
+router = routers.DefaultRouter()
+router.register('', BooksViewSet, basename="Transactions")
 
 urlpatterns = [
-    path('', UserBookView.as_view(), name="Books"),
-    path('manage/', EmployeeBookView.as_view(), name="Manage Books"),
-    path('manage/<str:pk>/', EmployeeBookDetailView.as_view(), name="Manage Book")
+    path('', include(router.urls))
 ]
