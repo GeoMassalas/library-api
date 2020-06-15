@@ -1,15 +1,30 @@
 from datetime import timedelta
 import uuid
 import os
+from barcode import EAN8
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.core.mail import send_mail
+from core.helpers import generate_password
+
+
+def generate_barcode(_id):
+    """ Generate file path for new image """
+    string = '0'*(8-len(_id)) + _id
+    ean = EAN8(string)
+    string += '.svg'
+    fp = os.path.join('media/barcodes/', string)
+    f = open(fp, 'wb')
+    ean.write(f)
+
+    return os.path.join('barcodes/', string)
 
 
 def book_image_file_path(instance, filename):
     """ Generate file path for new image """
     ext = filename.split('.')[-1]
     filename = f'{uuid.uuid4()}.{ext}'
-
+    print(filename)
     return os.path.join('book_imgs/', filename)
 
 
@@ -39,7 +54,16 @@ class UserManager(BaseUserManager):
             is_employee=False,
         )
         user.set_password(password)
+        message = 'Your account information is:\nEmail: ' + user.email + '\nPassword: ' + password
+        send_mail(
+            'Welcome to Library of ...',
+            message,
+            'geomassalas@gmail.com',
+            [user.email],
+            fail_silently=False,
+        )
         user.save(using=self._db)
+
         return user
 
     def create_superuser(self, email, username, password):
@@ -102,8 +126,12 @@ class Book(models.Model):
     category1 = models.CharField(max_length=25, null=False)
     category2 = models.CharField(max_length=25, null=True)
     category3 = models.CharField(max_length=25, null=True)
-    barcode = models.CharField(max_length=10, null=True)
-    image = models.ImageField(blank=True, null=True, upload_to=book_image_file_path,)
+    barcode = models.FileField(blank=True, null=True)
+    image = models.ImageField(blank=True, null=True, upload_to=book_image_file_path)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.barcode = generate_barcode(str(self.id))
 
     def __str__(self):
         return self.title

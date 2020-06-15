@@ -14,7 +14,7 @@ class IsEmployee(BasePermission):
 
 class IsManager(BasePermission):
     """
-    Permission for Employees
+    Permission for Managers
     """
 
     def has_permission(self, request, view):
@@ -27,7 +27,7 @@ class IsManager(BasePermission):
 
 class IsManagerOrReadOnly(BasePermission):
     """
-
+    Permission for Read-only or ManagerGroup
     """
     def has_permission(self, request, view):
         return bool((request.user

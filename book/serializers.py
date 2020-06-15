@@ -5,6 +5,7 @@ from core.models import Book
 class BookSerializer(serializers.ModelSerializer):
 
     image = serializers.ImageField(max_length=None, use_url=True, required=False)
+    barcode = serializers.FileField(use_url=True, read_only=True)
 
     class Meta:
         model = Book
