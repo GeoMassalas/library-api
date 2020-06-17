@@ -1,16 +1,17 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from django.utils.translation import ugettext_lazy as _
+from core.helpers import generate_password
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True, required=False)
 
     class Meta:
         model = get_user_model()
         fields = ('id', 'username', 'first_name', 'last_name', 'password', 'password2', 'email', 'address', 'phone')
         extra_kwargs = {'password': {'style': {'input_type': 'password'}, 'write_only': True,
-                                     'required': True, 'min_length': 8}}
+                                     'required': False, 'min_length': 8}}
 
     def create(self, validated_data):
         return get_user_model().objects.create_user(**validated_data)
@@ -27,9 +28,19 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if 'password' in data:
-            if data['password'] != data['password2']:
-                raise serializers.ValidationError("Passwords don't match.")
-            del data['password2']
+            if 'password2' in data:
+                if data['password'] != data['password2']:
+                    msg = _("Passwords don't match.")
+                    raise serializers.ValidationError(msg)
+                del data['password2']
+            else:
+                msg = _("No confirmation password provided.")
+                raise serializers.ValidationError(msg)
+        elif 'password2' in data:
+            msg = _("Only confirmation password provided.")
+            raise serializers.ValidationError(msg)
+        else:
+            data['password'] = generate_password()
         if 'phone' in data:
             if (len(data['phone']) != 10) | (not data['phone'].isdigit()):
                 raise serializers.ValidationError("Phone number must be 10 numbers.")

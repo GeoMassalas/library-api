@@ -142,6 +142,7 @@ MEDIA_URL = '/media/'
 
 try:
     from local_settings import *
-    print('Settings loaded')
 except ImportError:
+    print('-------------------------')
     print('Could not import settings')
+    print('-------------------------')

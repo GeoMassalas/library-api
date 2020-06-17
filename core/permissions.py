@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-
+from core.models import User
 SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 
 

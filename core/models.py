@@ -5,7 +5,6 @@ from barcode import EAN8
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.mail import send_mail
-from core.helpers import generate_password
 
 
 def generate_barcode(_id):
@@ -49,11 +48,13 @@ class UserManager(BaseUserManager):
             username=username,
             first_name=first_name,
             last_name=last_name,
+            password=password,
             address=address,
             phone=phone,
             is_employee=False,
         )
         user.set_password(password)
+        user.save(using=self._db)
         message = 'Your account information is:\nEmail: ' + user.email + '\nPassword: ' + password
         send_mail(
             'Welcome to Library of ...',
@@ -62,8 +63,6 @@ class UserManager(BaseUserManager):
             [user.email],
             fail_silently=False,
         )
-        user.save(using=self._db)
-
         return user
 
     def create_superuser(self, email, username, password):
