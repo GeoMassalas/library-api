@@ -125,12 +125,13 @@ class Book(models.Model):
     category1 = models.CharField(max_length=25, null=False)
     category2 = models.CharField(max_length=25, null=True)
     category3 = models.CharField(max_length=25, null=True)
-    barcode = models.FileField(blank=True, null=True)
+    barcode = models.FileField(blank=False, null=True)
     image = models.ImageField(blank=True, null=True, upload_to=book_image_file_path)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         self.barcode = generate_barcode(str(self.id))
+        super().save()
 
     def __str__(self):
         return self.title

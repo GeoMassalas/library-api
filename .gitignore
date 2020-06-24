@@ -112,5 +112,6 @@ media/
 
 .idea/
 db.sqlite3
-/media/
+/media/barcodes/*
+/media/book_imgs/*
 local_settings.py

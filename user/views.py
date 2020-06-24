@@ -57,8 +57,8 @@ def reset_password(request, pk):
     user.set_password(password)
     user.save()
     sts = status.HTTP_202_ACCEPTED
-    msg = {'message': "Your password has been successfully updated."}
-    email_message = 'Your password has been successfully updated.\n\n' \
+    msg = {'message': "User's password has been successfully updated."}
+    email_message = 'Your password has been reset.\n\n' \
                     'Your account information is now:\nEmail: ' + user.email + '\nPassword: ' + password
     email_title = 'Your account password has been reset.'
     send_mail(
@@ -74,7 +74,7 @@ def reset_password(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @authentication_classes((TokenAuthentication,))
-def reset_password(request, pk):
+def change_password(request, pk):
     """Resets users password"""
     query = User.objects.filter(id=pk)
     user = get_object_or_404(query)
